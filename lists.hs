@@ -42,6 +42,15 @@ isPalindrome [] = True
 isPalindrome [x] = True
 isPalindrome (x:xs) = x == last xs && isPalindrome (init xs)
 
+-- PROBLEM 7
+-- Flatten a nested list structure.
+data NestedList a = Elem a | List [NestedList a]
+flatten :: NestedList a -> [a]
+flatten (Elem x) = [x]
+flatten (List []) = []
+flatten (List (x:xs)) = flatten x ++ flatten (List xs)
+
+
 -- PROBLEM 8
 -- Eliminate consecutive duplicates of list elements.
 compress :: (Eq a) => [a] -> [a]
