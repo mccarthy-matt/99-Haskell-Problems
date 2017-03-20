@@ -41,3 +41,12 @@ isPalindrome :: (Eq a) => [a] -> Bool
 isPalindrome [] = True
 isPalindrome [x] = True
 isPalindrome (x:xs) = x == last xs && isPalindrome (init xs)
+
+-- PROBLEM 8
+-- Eliminate consecutive duplicates of list elements.
+compress :: (Eq a) => [a] -> [a]
+compress [] = []
+compress [x] = [x]
+compress (x:xs)
+  | x == head xs = compress xs
+  | otherwise = x:compress xs
