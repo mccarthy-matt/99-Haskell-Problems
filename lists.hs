@@ -25,14 +25,12 @@ elementAt (x:xs) n
 --  Find the number of elements in a list.
 length' :: [a] -> Int
 length' [] = 0
-length' [x] = 1
 length' (x:xs) = 1 + length xs
 
 -- PROBLEM 5
 -- Reverse a list.
 reverse' :: [a] -> [a]
 reverse' [] = []
-reverse' [x] = [x]
 reverse' (x:xs) = reverse xs ++ [x]
 
 -- PROBLEM 6
@@ -59,3 +57,7 @@ compress [x] = [x]
 compress (x:xs)
   | x == head xs = compress xs
   | otherwise = x:compress xs
+
+-- PROBLEM 9
+-- Pack consecutive duplicates of list elements into sublists. If a list
+-- contains repeated elements they should be placed in separate sublists.
