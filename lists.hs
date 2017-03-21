@@ -34,7 +34,7 @@ reverse' [] = []
 reverse' (x:xs) = reverse xs ++ [x]
 
 -- PROBLEM 6
--- Find out weather a list is a palindrome.
+-- Find out whether a list is a palindrome.
 isPalindrome :: (Eq a) => [a] -> Bool
 isPalindrome [] = True
 isPalindrome [x] = True
