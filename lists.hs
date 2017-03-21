@@ -61,3 +61,30 @@ compress (x:xs)
 -- PROBLEM 9
 -- Pack consecutive duplicates of list elements into sublists. If a list
 -- contains repeated elements they should be placed in separate sublists.
+-- Ex. pack [1,1,2,2,3,3,4] = [[1,1],[2,2],[3,3],[4]]
+pack :: (Eq a) => [a] -> [[a]]
+pack [] = []
+pack [x] = [[x]]
+pack (x:xs)
+  | x == (head (head (pack xs))) = (x:(head (pack xs))):(tail (pack xs))
+  | otherwise = [x]:(pack xs)
+
+-- PROBLEM 10
+-- Implement the run-length encoding data compression method. Consecutive
+-- duplicates of elements are encoded as lists (N E) where N is the
+-- number of duplicates of the element E.
+-- Ex. encode [1,1,1,2,2,2,3] = [(3,1),(3,2),(1,3)]
+encode :: (Eq a) => [a] -> [(Int,a)]
+encode [] = []
+encode [x] = [(1,x)]
+encode (x:xs)
+  | x == b    = (a+1,x):(tail (encode xs))
+  | otherwise = (1,x):(encode xs)
+  where (a,b) = head (encode xs)
+  
+-- PROBLEM 11
+-- Modify PROBLEM 10 in such a way that if an element has no duplicates
+-- it is simply copied into the result list. Only elements with duplicates
+-- are transferred as (N E) lists.
+-- Ex. encode-modified [1,1,2,3,3,3] =
+--  [Multiple 2 1, Single 2, Multiple 3,3]
