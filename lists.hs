@@ -95,5 +95,41 @@ encode (x:xs)
 -- Modify PROBLEM 10 in such a way that if an element has no duplicates
 -- it is simply copied into the result list. Only elements with duplicates
 -- are transferred as (N E) lists.
--- Ex. encode-modified [1,1,2,3,3,3] =
+-- Ex. encodeModified [1,1,2,3,3,3] =
 --  [Multiple 2 1, Single 2, Multiple 3,3]
+data ListItem a = Single a | Multiple Int a
+  deriving (Show)
+
+isSingle :: ListItem a -> Bool
+isSingle (Single _) = True
+isSingle (Multiple _ _) = False
+
+getItem :: ListItem a -> a
+getItem (Single x) = x
+getItem (Multiple _ x) = x
+
+numItems :: ListItem a -> Int
+numItems (Single _) = 1
+numItems (Multiple x _) = x
+
+encodeModified :: (Eq a) => [a] -> [ListItem a]
+encodeModified [] = []
+encodeModified [x] = [Single x]
+encodeModified [x,y]
+  | x == y = [Multiple 2 x]
+  | otherwise = [Single x, Single y]
+encodeModified (x:xs)
+  | x == firstListItem 
+         && isSingle encodedListHead =
+          (Multiple 2 x):encodedListTail
+  | x == firstListItem 
+         && not (isSingle encodedListHead) =
+          (Multiple ((numItems encodedListHead) + 1) x):encodedListTail
+  | otherwise =
+      Single x : encodedList
+  where encodedList = encodeModified xs
+        encodedListHead = head encodedList
+        encodedListTail = tail encodedList
+        firstListItem = getItem encodedListHead
+        
+
