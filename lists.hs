@@ -66,6 +66,14 @@ compress [x] = [x]
 compress (x:xs)
   | x == head xs = compress xs
   | otherwise = x:compress xs
+  
+compress' :: (Eq a) => [a] -> [a]
+compress' [] = []
+compress' [x] = [x]
+compress' (x:xs) = compress'' x (compress' xs) where
+                  compress'' x ys'@(y:ys)
+                    | x == y = ys'
+                    | otherwise = x:ys'
 
 -- PROBLEM 9
 -- Pack consecutive duplicates of list elements into sublists. If a list
@@ -77,18 +85,16 @@ pack :: (Eq a) => [a] -> [[a]]
 pack [] = []
 pack [x] = [[x]]
 pack (x:xs)
-  | x == (head (head (pack xs))) = (x:(head (pack xs))):(tail (pack xs))
+  | x `elem` (head (pack xs)) = (x:(head (pack xs))):(tail (pack xs))
   | otherwise = [x]:(pack xs)
-
--- this is a 2nd solution that uses more pattern matching
-pack :: (Eq a) => [a] -> [[a]]
-pack [] = []
-pack [x] = [[x]]
-pack (x:xs) = pack' x (pack xs) where
-              pack' x (y:ys)
-                | x `elem` y = (x:y):ys
-                | otherwise = [x]:(y:ys)
   
+pack' :: (Eq a) => [a] -> [[a]]
+pack' [] = []
+pack' [x] = [[x]]
+pack' (x:xs) = pack'' x (pack' xs) where
+              pack'' x ys'@(y:ys)
+                | x `elem` y = (x:y):ys
+                | otherwise = [x]:ys'
 
 
 -- PROBLEM 10
@@ -103,6 +109,16 @@ encode (x:xs)
   | x == b    = (a+1,x):(tail (encode xs))
   | otherwise = (1,x):(encode xs)
   where (a,b) = head (encode xs)
+
+encode' :: (Eq a) => [a] -> [(Int,a)]
+encode' [] = []
+encode' [x] = [(1,x)]
+encode' (x:xs) = encode'' x (encode' xs) where
+                 encode'' x ys'@(y:ys)
+                  | x == b = (a+1,x):ys
+                  | otherwise = (1,x):ys'
+                  where (a,b) = y
+
   
 -- PROBLEM 11
 -- Modify PROBLEM 10 in such a way that if an element has no duplicates
@@ -150,3 +166,4 @@ decodeModified (x:xs)
   | otherwise =
       (decodeModified [Multiple (amt-1) val]) ++ (val:(decodeModified xs))
   where (amt,val) = toTuple x
+
