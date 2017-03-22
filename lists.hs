@@ -71,12 +71,25 @@ compress (x:xs)
 -- Pack consecutive duplicates of list elements into sublists. If a list
 -- contains repeated elements they should be placed in separate sublists.
 -- Ex. pack [1,1,2,2,3,3,4] = [[1,1],[2,2],[3,3],[4]]
+
+
 pack :: (Eq a) => [a] -> [[a]]
 pack [] = []
 pack [x] = [[x]]
 pack (x:xs)
   | x == (head (head (pack xs))) = (x:(head (pack xs))):(tail (pack xs))
   | otherwise = [x]:(pack xs)
+
+-- this is a 2nd solution that uses more pattern matching
+pack :: (Eq a) => [a] -> [[a]]
+pack [] = []
+pack [x] = [[x]]
+pack (x:xs) = pack' x (pack xs) where
+              pack' x (y:ys)
+                | x `elem` y = (x:y):ys
+                | otherwise = [x]:(y:ys)
+  
+
 
 -- PROBLEM 10
 -- Implement the run-length encoding data compression method. Consecutive
