@@ -25,7 +25,7 @@ elementAt (x:xs) n
   | otherwise = xs `elementAt` (n-1)
 
 -- PROBLEM 4
---  Find the number of elements in a list.
+-- Find the number of elements in a list.
 -- Ex. length' [1,2,3,4,5] = 5
 length' :: [a] -> Int
 length' [] = 0
@@ -162,6 +162,24 @@ encodeModified' (x:xs) =
     | otherwise = (Single x):ys'
     where (a,b) = toTuple y
 
+encodeModified''' :: (Eq a) => [a] -> [ListItem a]
+encodeModified''' [] = []
+encodeModified''' (x:xs)
+  | count == 1 = (Single x):(encodeModified''' xs)
+  | otherwise = (Multiple count x):(encodeModified''' rest)
+  where (matched, rest) = span (==x) xs
+        count = 1 + (length matched)
+
+encodeModified'''' :: (Eq a) => [a] -> [ListItem a]
+encodeModified'''' [] = []
+encodeModified''''(x:xs) =
+  encodeModified''''' x (encodeModified'''' xs) where
+    encodeModified''''' x ys'@(y:ys)
+      | count == 1 = (Single x):ys'
+      | otherwise = (Multiple count x):ys
+      where (matched, rest) = span (==x) xs
+            count = 1 + (length matched)
+
 -- PROBLEM 12
 -- Decode a run-length encoded list.
 -- Ex. decodeModified [Multiple 3 2, Single 1, Multiple 2 4] =[2,2,2,1,4,4]
@@ -185,3 +203,31 @@ decodeModified' (x:xs) =
     | a == 1 = b:dmxs
     | otherwise = (decodeModified' [Multiple (a-1) b]) ++ (b:dmxs)
     where (a,b) = toTuple x
+
+-- PROBLEM 14
+-- Duplicate elements of a list.
+-- Ex. dupli [1,2,3] = [1,1,2,2,3,3]
+dupli :: [a] -> [a]
+dupli [] = []
+dupli [x] = [x,x]
+dupli (x:xs) = x:x:(dupli xs)
+
+dupli' :: [a] -> [a]
+dupli' [] = []
+dupli' [x] = [x,x]
+dupli' (x:xs) = 
+  dupli'' x (dupli' xs) where
+  dupli'' x dxs = x:x:dxs
+
+-- PROBLEM 15
+-- Replicate the elements of a list a given number of times.
+-- Ex. repli [1,2,3] 3 = [1,1,1,2,2,2,3,3,3]
+repli :: [a] -> Int -> [a]
+repli [] n = []
+repli (x:xs) n
+  | n == 1 = x:(repli xs n)
+  | otherwise = (repli [x] (n-1)) ++ (x:(repli xs n))
+  
+-- PROBLEM 16
+-- Drop every N'th element from a list.
+-- Ex. dropEvery [1,2,3,4,5,6] 2 = [1,3,5]
