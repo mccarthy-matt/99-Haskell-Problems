@@ -100,14 +100,6 @@ encode (x:xs)
 data ListItem a = Single a | Multiple Int a
   deriving (Show)
   
-getItem :: ListItem a -> a
-getItem (Single x) = x
-getItem (Multiple _ x) = x
-
-numItems :: ListItem a -> Int
-numItems (Single _) = 1
-numItems (Multiple x _) = x
-
 toTuple :: ListItem a -> (Int,a)
 toTuple (Single y) = (1,y)
 toTuple (Multiple x y) = (x,y)
@@ -122,21 +114,16 @@ encodeModified :: (Eq a) => [a] -> [ListItem a]
 encodeModified [] = []
 encodeModified [x] = [Single x]
 encodeModified [x,y]
-  | x == y = [Multiple 2 x]
+  | x == y    = [Multiple 2 y]
   | otherwise = [Single x, Single y]
 encodeModified (x:xs)
-  | x == firstListItem 
-    && isSingle encodedListHead =
-      (Multiple 2 x):encodedListTail
-  | x == firstListItem 
-    && not (isSingle encodedListHead) =
-      (Multiple ((numItems encodedListHead) + 1) x):encodedListTail
+  | x == headVal && headAmt == 1 = 
+      (Multiple 2 x):(tail (encodeModified xs))
+  | x == headVal && headAmt > 1 = 
+      (Multiple (headAmt+1) x):(tail (encodeModified xs))
   | otherwise =
-      Single x : encodedList
-  where encodedList     = encodeModified xs
-        encodedListHead = head encodedList
-        encodedListTail = tail encodedList
-        firstListItem   = getItem encodedListHead
+      (Single x):(encodeModified xs)
+  where (headAmt, headVal) = toTuple (head (encodeModified xs))
 
 -- PROBLEM 12
 -- Decode a run-length encoded list.
@@ -147,5 +134,6 @@ decodeModified [Single y] = [y]
 decodeModified [Multiple 2 y] = [y,y]
 decodeModified (x:xs)
   | amt == 1 = val:(decodeModified xs)
-  | otherwise = (decodeModified [Multiple (amt-1) val]) ++ (val:(decodeModified xs))
+  | otherwise =
+      (decodeModified [Multiple (amt-1) val]) ++ (val:(decodeModified xs))
   where (amt,val) = toTuple x
