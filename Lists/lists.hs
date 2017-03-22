@@ -36,7 +36,7 @@ length' (x:xs) = 1 + length xs
 -- Ex. reverse' [1,2,3] = [3,2,1]
 reverse' :: [a] -> [a]
 reverse' [] = []
-reverse' (x:xs) = reverse xs ++ [x]
+reverse' (x:xs) = reverse' xs ++ [x]
 
 -- PROBLEM 6
 -- Find out whether a list is a palindrome. A list is a palindrome if it is
@@ -55,7 +55,6 @@ flatten :: NestedList a -> [a]
 flatten (Elem x) = [x]
 flatten (List []) = []
 flatten (List (x:xs)) = flatten x ++ flatten (List xs)
-
 
 -- PROBLEM 8
 -- Eliminate consecutive duplicates of list elements.
@@ -79,8 +78,6 @@ compress' (x:xs) = compress'' x (compress' xs) where
 -- Pack consecutive duplicates of list elements into sublists. If a list
 -- contains repeated elements they should be placed in separate sublists.
 -- Ex. pack [1,1,2,2,3,3,4] = [[1,1],[2,2],[3,3],[4]]
-
-
 pack :: (Eq a) => [a] -> [[a]]
 pack [] = []
 pack [x] = [[x]]
@@ -95,8 +92,7 @@ pack' (x:xs) = pack'' x (pack' xs) where
               pack'' x ys'@(y:ys)
                 | x `elem` y = (x:y):ys
                 | otherwise = [x]:ys'
-
-
+                
 -- PROBLEM 10
 -- Implement the run-length encoding data compression method. Consecutive
 -- duplicates of elements are encoded as lists (N E) where N is the
@@ -119,13 +115,11 @@ encode' (x:xs) = encode'' x (encode' xs) where
                   | otherwise = (1,x):ys'
                   where (a,b) = y
 
-  
 -- PROBLEM 11
 -- Modify PROBLEM 10 in such a way that if an element has no duplicates
 -- it is simply copied into the result list. Only elements with duplicates
 -- are transferred as (N E) lists.
--- Ex. encodeModified [1,1,2,3,3,3] =
---  [Multiple 2 1, Single 2, Multiple 3,3]
+-- Ex. encodeModified [1,1,2,3,3] =[Multiple 2 1, Single 2, Multiple 2,3]
 data ListItem a = Single a | Multiple Int a
   deriving (Show)
   
@@ -154,6 +148,20 @@ encodeModified (x:xs)
       (Single x):(encodeModified xs)
   where (headAmt, headVal) = toTuple (head (encodeModified xs))
 
+encodeModified' :: (Eq a) => [a] -> [ListItem a]
+encodeModified' [] = []
+encodeModified' [x] = [Single x]
+encodeModified' [x,y]
+  | x == y = [Multiple 2 y]
+  | otherwise = [Single x, Single y]
+encodeModified' (x:xs) =
+  encodeModified'' x (encodeModified' xs) where
+  encodeModified'' x ys'@(y:ys)
+    | a == 1 && x == b = (Multiple 2 x):ys
+    | a > 1 && x == b  = (Multiple (a+1) x):ys
+    | otherwise = (Single x):ys'
+    where (a,b) = toTuple y
+
 -- PROBLEM 12
 -- Decode a run-length encoded list.
 -- Ex. decodeModified [Multiple 3 2, Single 1, Multiple 2 4] =[2,2,2,1,4,4]
@@ -167,3 +175,13 @@ decodeModified (x:xs)
       (decodeModified [Multiple (amt-1) val]) ++ (val:(decodeModified xs))
   where (amt,val) = toTuple x
 
+decodeModified' :: [ListItem a] -> [a]
+decodeModified' [] = []
+decodeModified' [Single y] = [y]
+decodeModified' [Multiple 2 y] = [y,y]
+decodeModified' (x:xs) =
+  decodeModified'' x (decodeModified' xs) where
+  decodeModified'' x dmxs
+    | a == 1 = b:dmxs
+    | otherwise = (decodeModified' [Multiple (a-1) b]) ++ (b:dmxs)
+    where (a,b) = toTuple x
