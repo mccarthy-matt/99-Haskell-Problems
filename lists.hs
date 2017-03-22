@@ -99,11 +99,7 @@ encode (x:xs)
 --  [Multiple 2 1, Single 2, Multiple 3,3]
 data ListItem a = Single a | Multiple Int a
   deriving (Show)
-
-isSingle :: ListItem a -> Bool
-isSingle (Single _) = True
-isSingle (Multiple _ _) = False
-
+  
 getItem :: ListItem a -> a
 getItem (Single x) = x
 getItem (Multiple _ x) = x
@@ -111,6 +107,16 @@ getItem (Multiple _ x) = x
 numItems :: ListItem a -> Int
 numItems (Single _) = 1
 numItems (Multiple x _) = x
+
+toTuple :: ListItem a -> (Int,a)
+toTuple (Single y) = (1,y)
+toTuple (Multiple x y) = (x,y)
+
+isSingle :: ListItem a -> Bool
+isSingle x
+  | amt == 1 = True
+  | otherwise = False
+  where (amt,_) = toTuple x
 
 encodeModified :: (Eq a) => [a] -> [ListItem a]
 encodeModified [] = []
@@ -120,16 +126,26 @@ encodeModified [x,y]
   | otherwise = [Single x, Single y]
 encodeModified (x:xs)
   | x == firstListItem 
-         && isSingle encodedListHead =
-          (Multiple 2 x):encodedListTail
+    && isSingle encodedListHead =
+      (Multiple 2 x):encodedListTail
   | x == firstListItem 
-         && not (isSingle encodedListHead) =
-          (Multiple ((numItems encodedListHead) + 1) x):encodedListTail
+    && not (isSingle encodedListHead) =
+      (Multiple ((numItems encodedListHead) + 1) x):encodedListTail
   | otherwise =
       Single x : encodedList
-  where encodedList = encodeModified xs
+  where encodedList     = encodeModified xs
         encodedListHead = head encodedList
         encodedListTail = tail encodedList
-        firstListItem = getItem encodedListHead
-        
+        firstListItem   = getItem encodedListHead
 
+-- PROBLEM 12
+-- Decode a run-length encoded list.
+-- Ex. decodeModified [Multiple 3 2, Single 1, Multiple 2 4] =[2,2,2,1,4,4]
+decodeModified :: [ListItem a] -> [a]
+decodeModified [] = []
+decodeModified [Single y] = [y]
+decodeModified [Multiple 2 y] = [y,y]
+decodeModified (x:xs)
+  | amt == 1 = val:(decodeModified xs)
+  | otherwise = (decodeModified [Multiple (amt-1) val]) ++ (val:(decodeModified xs))
+  where (amt,val) = toTuple x
