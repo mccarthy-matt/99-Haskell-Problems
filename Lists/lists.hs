@@ -228,6 +228,10 @@ repli (x:xs) n
   | n == 1 = x:(repli xs n)
   | otherwise = (repli [x] (n-1)) ++ (x:(repli xs n))
   
--- PROBLEM 16
--- Drop every N'th element from a list.
--- Ex. dropEvery [1,2,3,4,5,6] 2 = [1,3,5]
+-- Quicksort
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) =
+  (quicksort lessOrEqual) ++ [x] ++ (quicksort greater) where
+  lessOrEqual = [ y | y <- xs, y <= x ]
+  greater     = [ y | y <- xs, y > x ]
