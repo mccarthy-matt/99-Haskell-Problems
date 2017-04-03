@@ -6,6 +6,9 @@ last' [] = error "empty list"
 last' [x] = x
 last' (x:xs) = last xs
 
+last'' :: [a] -> a
+last'' = foldl1 (\_ x -> x)
+
 -- PROBLEM 2
 -- Find the last but one element of a list.
 -- Ex. lastButOne [1,2,3] = 2
@@ -14,6 +17,9 @@ lastButOne [] = error "empty list"
 lastButOne [x] = error "list has only one element"
 lastButOne [x,y] = x
 lastButOne (x:xs) = lastButOne xs
+
+lastButOne' :: [a] -> a
+lastButOne' = foldl1 (\_ x -> x) . init
 
 -- PROBLEM 3
 -- Find the Kth element of a list. The first element in the list is number 1.
@@ -31,12 +37,18 @@ length' :: [a] -> Int
 length' [] = 0
 length' (x:xs) = 1 + length xs
 
+length'' :: [a] -> Integer
+length'' = foldr (\x acc -> acc + 1) 0
+
 -- PROBLEM 5
 -- Reverse a list.
 -- Ex. reverse' [1,2,3] = [3,2,1]
 reverse' :: [a] -> [a]
 reverse' [] = []
 reverse' (x:xs) = reverse' xs ++ [x]
+
+reverse'' :: [a] -> [a]
+reverse'' = foldl (\acc x -> x : acc) []
 
 -- PROBLEM 6
 -- Find out whether a list is a palindrome. A list is a palindrome if it is
@@ -212,6 +224,9 @@ dupli [] = []
 dupli [x] = [x,x]
 dupli (x:xs) = x:x:(dupli xs)
 
+dupli'' :: [a] -> [a]
+dupli'' = foldr (\x acc -> x : x : acc) []
+
 dupli' :: [a] -> [a]
 dupli' [] = []
 dupli' [x] = [x,x]
@@ -227,11 +242,3 @@ repli [] n = []
 repli (x:xs) n
   | n == 1 = x:(repli xs n)
   | otherwise = (repli [x] (n-1)) ++ (x:(repli xs n))
-  
--- Quicksort
-quicksort :: (Ord a) => [a] -> [a]
-quicksort [] = []
-quicksort (x:xs) =
-  (quicksort lessOrEqual) ++ [x] ++ (quicksort greater) where
-  lessOrEqual = [ y | y <- xs, y <= x ]
-  greater     = [ y | y <- xs, y > x ]
